@@ -1,7 +1,9 @@
 package com.nikhil.trello.controller;
 
-import com.nikhil.trello.dto.SignUpRequest;
-import com.nikhil.trello.dto.SignUpResponse;
+import com.nikhil.trello.dto.LoginRequest;
+import com.nikhil.trello.dto.LoginResponse;
+import com.nikhil.trello.dto.SignupRequest;
+import com.nikhil.trello.dto.SignupResponse;
 import com.nikhil.trello.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +19,20 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponse> signUp(
-            @Valid @RequestBody SignUpRequest request
+    public ResponseEntity<SignupResponse> signup(
+            @Valid @RequestBody SignupRequest request
             ){
-        SignUpResponse response = authService.signUp(request);
+        SignupResponse response = authService.signup(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> logIn(
+            @Valid @RequestBody LoginRequest request
+            ){
+        LoginResponse response = authService.login(request);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

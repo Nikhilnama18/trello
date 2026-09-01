@@ -1,9 +1,9 @@
 package com.nikhil.trello.service;
 
-import com.nikhil.trello.dto.SignUpResponse;
-import com.nikhil.trello.dto.SignUpRequest;
+import com.nikhil.trello.dto.*;
 import com.nikhil.trello.entity.User;
 import com.nikhil.trello.exception.EmailAlreadyExistsException;
+import com.nikhil.trello.exception.InvalidCredentialsException;
 import com.nikhil.trello.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,7 +17,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
 
-    public SignUpResponse signUp(SignUpRequest request){
+    public SignupResponse signup(SignupRequest request){
         if(userRepository.existsByEmail(request.email())){
 
             throw new EmailAlreadyExistsException("Email already exists");
@@ -28,8 +28,21 @@ public class AuthService {
 
         User savedUser = userRepository.save(user);
 
-        String accessToken = tokenService.generateAccessToken(savedUser);
+        GeneratedToken token = tokenService.generateAccessToken(savedUser);
 
-        return new SignUpResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), accessToken);
+        return new SignupResponse(savedUser.getId(), savedUser.getName(), savedUser.getEmail(), token.accessToken());
+    }
+
+    public LoginResponse login(LoginRequest request){
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(()-> new InvalidCredentialsException("Invalid email or password"));
+
+        if(!passwordEncoder.matches(request.password(), user.getPassword())){
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
+        GeneratedToken token = tokenService.generateAccessToken(user);
+
+        return new LoginResponse(user.getId(), token.accessToken(), token.expiration());
     }
 }
