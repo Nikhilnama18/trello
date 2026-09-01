@@ -21,12 +21,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
-        log.info("Configuring application security filter chain");
+        log.info("Configuring application security filter chain with login");
 
         return http
                 .csrf(csrf-> csrf.disable())
                 .authorizeHttpRequests(auth ->auth
-                        .requestMatchers( "/api/v1/signup").permitAll()
+                        .requestMatchers( "/api/v1/signup", "/api/v1/login").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }

@@ -1,5 +1,6 @@
 package com.nikhil.trello.service;
 
+import com.nikhil.trello.dto.GeneratedToken;
 import com.nikhil.trello.entity.User;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,15 +26,18 @@ public class TokenService {
         this.expiration = expiration;
     }
 
-    public String generateAccessToken(User user){
+    public GeneratedToken generateAccessToken(User user){
         Instant now = Instant.now();
+        Instant expiresAt = Instant.now().plusMillis(expiration);
 
-        return Jwts.builder()
+        String accessToken = Jwts.builder()
                 .subject(user.getId().toString())
                 .claim("email", user.getEmail())
                 .issuedAt(Date.from(now))
-                .expiration(Date.from(now.plusMillis(expiration)))
+                .expiration(Date.from(expiresAt))
                 .signWith(secretKey)
                 .compact();
+
+        return new GeneratedToken(accessToken, expiresAt);
     }
 }
