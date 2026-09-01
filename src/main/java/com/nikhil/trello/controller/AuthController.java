@@ -24,10 +24,4 @@ public class AuthController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
-
-    @GetMapping("/ping")
-    public String ping(){
-        System.out.println("PING CONTROLLER HIT");
-        return "pong";
-    }
 }
