@@ -2,6 +2,8 @@ package com.nikhil.trello.service;
 
 import com.nikhil.trello.dto.GeneratedToken;
 import com.nikhil.trello.entity.User;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +13,7 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class TokenService {
@@ -31,13 +34,41 @@ public class TokenService {
         Instant expiresAt = Instant.now().plusMillis(expiration);
 
         String accessToken = Jwts.builder()
-                .subject(user.getId().toString())
-                .claim("email", user.getEmail())
+                .subject(user.getEmail())
+                .claim("userId", user.getId().toString())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiresAt))
                 .signWith(secretKey)
                 .compact();
 
         return new GeneratedToken(accessToken, expiresAt);
+    }
+
+    public boolean isTokenValid(String token){
+        try{
+            extractClaims(token);
+            return true;
+        }catch (JwtException | IllegalArgumentException e){
+            return false;
+        }
+    }
+
+    private Claims extractClaims(String token){
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+    }
+
+    public String extractEmail(String token){
+        return this.extractClaims(token).getSubject();
+    }
+
+    public UUID extractUserId(String token){
+        String userId = extractClaims(token)
+                .get("userId", String.class);
+
+        return UUID.fromString(userId);
     }
 }
