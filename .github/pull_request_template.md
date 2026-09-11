@@ -3,5 +3,5 @@
 ## Annotations used?
 
 ## Verified
-[] Yes
-[] No
+- [ ] Yes
+- [ ] No

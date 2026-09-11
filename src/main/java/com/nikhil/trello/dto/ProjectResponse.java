@@ -3,10 +3,10 @@ package com.nikhil.trello.dto;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserResponse(
+public record ProjectResponse(
         UUID id,
         String name,
-        String email,
+        UUID userId,
         Instant createdAt
 ) {
 }

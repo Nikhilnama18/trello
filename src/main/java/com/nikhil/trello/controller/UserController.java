@@ -21,7 +21,6 @@ public class UserController {
 
     private final UserService userService;
 
-
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserResponse> getUser(
     @PathVariable UUID userId,
