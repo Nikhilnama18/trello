@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "projects")
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project {
 
@@ -25,13 +27,17 @@ public class Project {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", nullable = false)
-    private User created_by;
+    private User createdBy;
 
     @CreationTimestamp
-    private Instant createAt;
+    private Instant createdAt;
 
-    public Project(String name, User created_by){
+    public Project(String name, User createdBy){
         this.name = name;
-        this.created_by = created_by;
+        this.createdBy = createdBy;
+    }
+
+    public void updateName(String name){
+        this.name = name;
     }
 }
