@@ -12,5 +12,7 @@ import java.util.UUID;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, UUID> {
     Page<Project> findByCreatedById(UUID userId, Pageable pageable);
-    Optional<Project> findByIdAndCreatedById(UUID id, UUID userId);
+    Optional<Project> findProjectById(UUID id);
+    Optional<Project> findProjectByIdAndCreatedById(UUID id, UUID userId);
+    boolean existsByProjectIdAndUserId(UUID id, UUID userId);
 }

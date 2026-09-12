@@ -3,6 +3,7 @@ package com.nikhil.trello.entity;
 import com.nikhil.trello.model.ProjectRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
                 @UniqueConstraint(columnNames = {"project_id" , "user_id"})
         }
 )
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ProjectMember {
 
