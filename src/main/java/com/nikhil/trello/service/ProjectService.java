@@ -2,8 +2,10 @@ package com.nikhil.trello.service;
 
 import com.nikhil.trello.dto.CreateProjectRequest;
 import com.nikhil.trello.dto.PageResponse;
+import com.nikhil.trello.dto.ProjectMemberResponse;
 import com.nikhil.trello.dto.ProjectResponse;
 import com.nikhil.trello.entity.Project;
+import com.nikhil.trello.entity.ProjectMember;
 import com.nikhil.trello.entity.User;
 import com.nikhil.trello.exception.ResourceNotFoundException;
 import com.nikhil.trello.model.ProjectRole;
@@ -35,7 +37,7 @@ public class ProjectService {
 
         Project savedProject = projectRepository.save(project);
 
-        projectMemberService.createProject(savedProject, user, ProjectRole.OWNER);
+        projectMemberService.createMemberForProject(savedProject, user, ProjectRole.OWNER);
 
         return new ProjectResponse(savedProject.getId(), savedProject.getName(), user.getId(), savedProject.getCreatedAt());
     }
@@ -63,14 +65,24 @@ public class ProjectService {
          );
     }
 
-    public ProjectResponse getProjectByIdAndUserId(
+    public Project getProjectByIdAndUserId(
             UUID projectId,
             UUID userId
     ){
-        Project project = projectRepository.findByIdAndCreatedById(projectId, userId)
+        return projectRepository.findProjectByIdAndCreatedById(projectId, userId)
                 .orElseThrow(()-> new ResourceNotFoundException("Project not found"));
+    }
 
+    public ProjectResponse getProjectResponseByIdAndUserId(
+            UUID projectId,
+            UUID userId
+    ){
+        Project project = this.getProjectByIdAndUserId(projectId, userId);
         return this.toProjectResponse(project);
+    }
+
+    public boolean projectBelongsToUserId(UUID projectId, UUID userId){
+        return projectRepository.existsByProjectIdAndUserId(projectId, userId);
     }
 
     public ProjectResponse updateProjectName(
@@ -78,7 +90,7 @@ public class ProjectService {
             UUID userId,
             String name
     ){
-        Project project = projectRepository.findByIdAndCreatedById(projectId, userId)
+        Project project = projectRepository.findProjectByIdAndCreatedById(projectId, userId)
             .orElseThrow(()-> new ResourceNotFoundException("Project not found"));
 
         project.updateName(name);
@@ -86,6 +98,10 @@ public class ProjectService {
         Project savedProject = projectRepository.save(project);
 
         return this.toProjectResponse(savedProject);
+    }
+
+    public Project getProjectById(UUID projectId){
+        return projectRepository.findProjectById(projectId).orElseThrow(()-> new ResourceNotFoundException("Project not found"));
     }
 
     private ProjectResponse toProjectResponse(Project project){

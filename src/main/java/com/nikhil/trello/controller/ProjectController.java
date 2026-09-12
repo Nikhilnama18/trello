@@ -22,65 +22,45 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    @PostMapping("/users/{userId}/projects")
+    @PostMapping("/projects")
     public ResponseEntity<ProjectResponse> createProject(
-            @PathVariable UUID userId,
             @AuthenticationPrincipal UUID authenticatedUserId,
             @Valid @RequestBody CreateProjectRequest request
             ){
 
-        if(!userId.equals(authenticatedUserId)){
-            throw  new AccessDeniedException("Cannot create project for another user");
-        }
-
-        ProjectResponse response = projectService.createProject(request, userId);
+        ProjectResponse response = projectService.createProject(request, authenticatedUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("/users/{userId}/projects")
+    @GetMapping("/projects")
     public ResponseEntity<PageResponse<ProjectResponse>> getProjectsForAUser(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
-            @PathVariable UUID userId,
             @AuthenticationPrincipal UUID authenticatedUserId
 
     ){
-        if(!userId.equals(authenticatedUserId)){
-            throw  new AccessDeniedException("Cannot create project for another user");
-        }
-
         return ResponseEntity.ok(
-                projectService.getProjectsForAUser(userId, page, pageSize)
+                projectService.getProjectsForAUser(authenticatedUserId, page, pageSize)
         );
     }
 
-    @GetMapping("/users/{userId}/projects/{projectId}")
+    @GetMapping("/projects/{projectId}")
     public ResponseEntity<ProjectResponse>getProjectByIdAndUserId(
-            @PathVariable UUID userId,
             @PathVariable UUID projectId,
             @AuthenticationPrincipal UUID authenticatedUserId
     ){
-        if(!userId.equals(authenticatedUserId)){
-            throw  new AccessDeniedException("Cannot create project for another user");
-        }
-
         return ResponseEntity.ok(
-                projectService.getProjectByIdAndUserId(projectId, userId)
+                projectService.getProjectResponseByIdAndUserId(projectId, authenticatedUserId)
         );
     }
 
-    @PatchMapping("/users/{userId}/projects/{projectId}")
+    @PatchMapping("/projects/{projectId}")
     public ResponseEntity<ProjectResponse> updateProjectByIdAndUserId(
-            @PathVariable UUID userId,
             @PathVariable UUID projectId,
             @AuthenticationPrincipal UUID authenticatedUserId,
             @Valid @RequestBody UpdateProjectRequest request
     ){
-        if(!userId.equals(authenticatedUserId)){
-            throw  new AccessDeniedException("Cannot create project for another user");
-        }
-
-        ProjectResponse response = projectService.updateProjectName(projectId, userId, request.name());
+        ProjectResponse response = projectService.updateProjectName(projectId, authenticatedUserId, request.name());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
